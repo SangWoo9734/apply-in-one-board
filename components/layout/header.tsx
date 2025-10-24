@@ -1,12 +1,14 @@
 'use client';
 
-import { Search, Menu, LogOut, User } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Menu, LogOut, User, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useFilterStore } from '@/store/filter-store';
 import { useAuthStore } from '@/store/auth-store';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { AddJobDialog } from '@/components/jobs/add-job-dialog';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -16,6 +18,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { searchQuery, setSearchQuery } = useFilterStore();
   const { user } = useAuthStore();
   const router = useRouter();
+  const [addJobOpen, setAddJobOpen] = useState(false);
 
   const handleLogout = async () => {
     const supabase = createClient();
@@ -58,7 +61,8 @@ export function Header({ onMenuClick }: HeaderProps) {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="default" size="sm">
+          <Button variant="default" size="sm" onClick={() => setAddJobOpen(true)}>
+            <Plus className="mr-1 h-4 w-4" />
             공고 추가
           </Button>
 
@@ -80,6 +84,8 @@ export function Header({ onMenuClick }: HeaderProps) {
           )}
         </div>
       </div>
+
+      <AddJobDialog open={addJobOpen} onOpenChange={setAddJobOpen} />
     </header>
   );
 }
