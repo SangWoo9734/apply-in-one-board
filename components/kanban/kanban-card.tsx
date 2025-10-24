@@ -1,10 +1,12 @@
 'use client';
 
 import { JobTracking } from '@/types/job';
-import { Calendar, ExternalLink, Trash2 } from 'lucide-react';
+import { Calendar, ExternalLink, Trash2, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDeleteJob } from '@/lib/hooks/use-jobs';
 import { useToast } from '@/hooks/use-toast';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface KanbanCardProps {
   job: JobTracking;
@@ -13,6 +15,21 @@ interface KanbanCardProps {
 export function KanbanCard({ job }: KanbanCardProps) {
   const deleteJob = useDeleteJob();
   const { toast } = useToast();
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: job.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -66,9 +83,20 @@ export function KanbanCard({ job }: KanbanCardProps) {
 
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       className="group relative rounded-lg border border-bg-300 bg-bg-100 p-4 transition-all hover:border-primary-200 hover:shadow-lg cursor-pointer"
       onClick={handleCardClick}
     >
+      {/* Drag Handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute left-2 top-2 cursor-grab opacity-0 transition-opacity group-hover:opacity-100 active:cursor-grabbing"
+      >
+        <GripVertical className="h-4 w-4 text-text-300" />
+      </div>
+
       {/* Company Avatar */}
       <div className="mb-3 flex items-start justify-between">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-lg font-bold text-white">

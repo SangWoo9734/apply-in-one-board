@@ -2,6 +2,8 @@
 
 import { JobStatus, JobTracking } from '@/types/job';
 import { KanbanCard } from './kanban-card';
+import { useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 interface KanbanColumnProps {
   id: JobStatus;
@@ -11,6 +13,12 @@ interface KanbanColumnProps {
 }
 
 export function KanbanColumn({ id, title, color, jobs }: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: id,
+  });
+
+  const jobIds = jobs.map((job) => job.id);
+
   return (
     <div className="flex w-80 flex-shrink-0 flex-col rounded-lg border border-bg-300 bg-bg-200">
       {/* Column Header */}
@@ -23,14 +31,21 @@ export function KanbanColumn({ id, title, color, jobs }: KanbanColumnProps) {
       </div>
 
       {/* Column Content */}
-      <div className="flex-1 space-y-3 overflow-y-auto p-4">
-        {jobs.length === 0 ? (
-          <div className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-bg-300">
-            <p className="text-sm text-text-300">비어있음</p>
-          </div>
-        ) : (
-          jobs.map((job) => <KanbanCard key={job.id} job={job} />)
-        )}
+      <div
+        ref={setNodeRef}
+        className={`flex-1 space-y-3 overflow-y-auto p-4 transition-colors ${
+          isOver ? 'bg-primary-100/10' : ''
+        }`}
+      >
+        <SortableContext items={jobIds} strategy={verticalListSortingStrategy}>
+          {jobs.length === 0 ? (
+            <div className="flex h-32 items-center justify-center rounded-lg border-2 border-dashed border-bg-300">
+              <p className="text-sm text-text-300">비어있음</p>
+            </div>
+          ) : (
+            jobs.map((job) => <KanbanCard key={job.id} job={job} />)
+          )}
+        </SortableContext>
       </div>
     </div>
   );
