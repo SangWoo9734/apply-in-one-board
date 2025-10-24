@@ -14,9 +14,10 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { KanbanCard } from './kanban-card';
 import { useToast } from '@/hooks/use-toast';
+import { useFilterStore } from '@/store/filter-store';
 
 const COLUMNS: Array<{
   id: JobStatus;
@@ -40,6 +41,7 @@ export function KanbanBoard() {
   const { data: jobs, isLoading, error } = useJobs();
   const updateJob = useUpdateJob();
   const { toast } = useToast();
+  const { searchQuery, selectedStatuses } = useFilterStore();
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
@@ -49,6 +51,31 @@ export function KanbanBoard() {
       },
     })
   );
+
+  // Apply filters
+  const filteredJobs = useMemo(() => {
+    if (!jobs) return [];
+
+    return jobs.filter((job) => {
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch =
+          job.company?.toLowerCase().includes(query) ||
+          job.position?.toLowerCase().includes(query) ||
+          job.keywords?.some((k) => k.toLowerCase().includes(query));
+
+        if (!matchesSearch) return false;
+      }
+
+      // Status filter
+      if (selectedStatuses.length > 0) {
+        if (!selectedStatuses.includes(job.status)) return false;
+      }
+
+      return true;
+    });
+  }, [jobs, searchQuery, selectedStatuses]);
 
   if (isLoading) {
     return (
@@ -69,10 +96,11 @@ export function KanbanBoard() {
   // Group jobs by status
   const jobsByStatus = COLUMNS.reduce(
     (acc, column) => {
-      acc[column.id] = jobs?.filter((job) => job.status === column.id) || [];
+      acc[column.id] =
+        filteredJobs?.filter((job) => job.status === column.id) || [];
       return acc;
     },
-    {} as Record<JobStatus, typeof jobs>
+    {} as Record<JobStatus, typeof filteredJobs>
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -129,7 +157,13 @@ export function KanbanBoard() {
         <div className="border-b border-bg-300 p-6">
           <h1 className="text-2xl font-bold text-text-100">칸반 보드</h1>
           <p className="mt-1 text-sm text-text-300">
-            총 {jobs?.length || 0}개의 공고
+            {selectedStatuses.length > 0 || searchQuery ? (
+              <>
+                필터링된 {filteredJobs.length}개 / 전체 {jobs?.length || 0}개
+              </>
+            ) : (
+              <>총 {jobs?.length || 0}개의 공고</>
+            )}
           </p>
         </div>
 
