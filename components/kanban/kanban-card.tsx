@@ -1,12 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { JobTracking } from '@/types/job';
-import { Calendar, ExternalLink, Trash2, GripVertical } from 'lucide-react';
+import { Calendar, ExternalLink, Trash2, GripVertical, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDeleteJob } from '@/lib/hooks/use-jobs';
 import { useToast } from '@/hooks/use-toast';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { EditJobDialog } from '@/components/jobs/edit-job-dialog';
 
 interface KanbanCardProps {
   job: JobTracking;
@@ -15,6 +17,7 @@ interface KanbanCardProps {
 export function KanbanCard({ job }: KanbanCardProps) {
   const deleteJob = useDeleteJob();
   const { toast } = useToast();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const {
     attributes,
@@ -105,6 +108,17 @@ export function KanbanCard({ job }: KanbanCardProps) {
 
         {/* Actions */}
         <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditDialogOpen(true);
+            }}
+          >
+            <Edit className="h-3.5 w-3.5" />
+          </Button>
           {job.url && (
             <Button
               variant="ghost"
@@ -166,6 +180,13 @@ export function KanbanCard({ job }: KanbanCardProps) {
           메모: {job.memo}
         </div>
       )}
+
+      {/* Edit Dialog */}
+      <EditJobDialog
+        job={job}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      />
     </div>
   );
 }
