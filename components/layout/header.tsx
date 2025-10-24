@@ -1,9 +1,12 @@
 'use client';
 
-import { Search, Menu } from 'lucide-react';
+import { Search, Menu, LogOut, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useFilterStore } from '@/store/filter-store';
+import { useAuthStore } from '@/store/auth-store';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -11,6 +14,14 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const { searchQuery, setSearchQuery } = useFilterStore();
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-bg-300 bg-bg-100">
@@ -50,6 +61,23 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Button variant="default" size="sm">
             공고 추가
           </Button>
+
+          {/* User Menu */}
+          {user && (
+            <div className="flex items-center gap-2 border-l border-bg-300 pl-4">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-white">
+                {user.email?.[0].toUpperCase()}
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLogout}
+                title="로그아웃"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </header>
