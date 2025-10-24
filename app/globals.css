@@ -2,26 +2,215 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   지원한판 - 디자인 시스템
+   다크모드 기본 적용
+   ======================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary Colors - 메인 액션, 중요 버튼 */
+  --primary-100: #2e8b57; /* SeaGreen - 메인 */
+  --primary-200: #61bc84; /* 밝은 그린 - Hover */
+  --primary-300: #c6ffe6; /* 매우 밝은 그린 - 배경/강조 */
+
+  /* Accent Colors - 보조 강조 */
+  --accent-100: #8fbc8f; /* DarkSeaGreen - 보조 */
+  --accent-200: #345e37; /* 어두운 그린 - 진한 강조 */
+
+  /* Text Colors */
+  --text-100: #ffffff; /* 주요 텍스트 */
+  --text-200: #e0e0e0; /* 보조 텍스트 */
+  --text-300: #a0a0a0; /* 비활성 텍스트 */
+
+  /* Background Colors */
+  --bg-100: #1e1e1e; /* 메인 배경 */
+  --bg-200: #2d2d2d; /* 카드 배경 */
+  --bg-300: #454545; /* 호버/선택 배경 */
+  --bg-400: #1a1a1a; /* 더 어두운 배경 (구분용) */
+
+  /* Status Colors - 지원 단계별 */
+  --status-interested: #8fbc8f; /* 관심 있음 */
+  --status-preparing: #4a9eff; /* 지원 준비 */
+  --status-applied: #2e8b57; /* 지원 완료 */
+  --status-document-passed: #7b68ee; /* 서류 통과 */
+  --status-interview: #ff8c42; /* 면접 대기 */
+  --status-accepted: #4caf50; /* 최종 합격 */
+  --status-rejected: #757575; /* 불합격 */
+
+  /* Semantic Colors */
+  --success: #4caf50;
+  --error: #ef5350;
+  --warning: #ffa726;
+  --info: #42a5f5;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+
+  /* Layout */
+  --header-height: 64px;
+  --sidebar-width: 280px;
+  --container-max-width: 1440px;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Font Family */
+  --font-primary: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-brand: 'RixInuaridurine', var(--font-primary);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-gray-700;
   }
-}
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-[#1e1e1e] text-white;
+    font-family: var(--font-primary);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  h1 {
+    @apply text-3xl font-semibold;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold;
+  }
+
+  h3 {
+    @apply text-xl font-semibold;
+  }
+
+  /* 스크롤바 스타일링 */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-200);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--bg-300);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-100);
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* 애니메이션 유틸리티 */
+  .transition-smooth {
+    transition: all 0.2s ease;
+  }
+
+  .transition-slow {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* 상태별 컬러 유틸리티 */
+  .bg-status-interested {
+    background-color: var(--status-interested);
+  }
+
+  .bg-status-preparing {
+    background-color: var(--status-preparing);
+  }
+
+  .bg-status-applied {
+    background-color: var(--status-applied);
+  }
+
+  .bg-status-document-passed {
+    background-color: var(--status-document-passed);
+  }
+
+  .bg-status-interview {
+    background-color: var(--status-interview);
+  }
+
+  .bg-status-accepted {
+    background-color: var(--status-accepted);
+  }
+
+  .bg-status-rejected {
+    background-color: var(--status-rejected);
+  }
+}
+
+/* 키 프레임 애니메이션 */
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUpToast {
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -24px);
+    opacity: 1;
+  }
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-toast {
+  animation: slideUpToast 0.3s ease-out;
+}
+
+.animate-card-in {
+  animation: cardSlideIn 0.3s ease-out;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
