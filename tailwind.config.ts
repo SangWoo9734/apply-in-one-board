@@ -11,14 +11,14 @@ const config: Config = {
       colors: {
         // Primary
         primary: {
-          100: '#2e8b57',
-          200: '#61bc84',
-          300: '#c6ffe6',
+          100: '#32c87b',
+          200: '#5ad494',
+          300: '#d4ffec',
         },
         // Accent
         accent: {
-          100: '#8fbc8f',
-          200: '#345e37',
+          100: '#6dd89f',
+          200: '#28a566',
         },
         // Text
         text: {
@@ -35,16 +35,16 @@ const config: Config = {
         },
         // Status
         status: {
-          interested: '#8fbc8f',
+          interested: '#6dd89f',
           preparing: '#4a9eff',
-          applied: '#2e8b57',
+          applied: '#32c87b',
           'document-passed': '#7b68ee',
           interview: '#ff8c42',
-          accepted: '#4caf50',
+          accepted: '#32c87b',
           rejected: '#757575',
         },
         // Semantic
-        success: '#4caf50',
+        success: '#32c87b',
         error: '#ef5350',
         warning: '#ffa726',
         info: '#42a5f5',
@@ -87,9 +87,9 @@ const config: Config = {
       },
       boxShadow: {
         card: '0 2px 8px rgba(0, 0, 0, 0.3)',
-        'card-hover': '0 4px 12px rgba(46, 139, 87, 0.2)',
+        'card-hover': '0 4px 12px rgba(50, 200, 123, 0.2)',
         toast: '0 4px 12px rgba(0, 0, 0, 0.4)',
-        dragging: '0 8px 20px rgba(46, 139, 87, 0.4)',
+        dragging: '0 8px 20px rgba(50, 200, 123, 0.4)',
       },
       transitionTimingFunction: {
         smooth: 'cubic-bezier(0.4, 0, 0.2, 1)',

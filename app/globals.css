@@ -9,13 +9,13 @@
 
 :root {
   /* Primary Colors - 메인 액션, 중요 버튼 */
-  --primary-100: #2e8b57; /* SeaGreen - 메인 */
-  --primary-200: #61bc84; /* 밝은 그린 - Hover */
-  --primary-300: #c6ffe6; /* 매우 밝은 그린 - 배경/강조 */
+  --primary-100: #32c87b; /* 메인 그린 */
+  --primary-200: #5ad494; /* 밝은 그린 - Hover */
+  --primary-300: #d4ffec; /* 매우 밝은 그린 - 배경/강조 */
 
   /* Accent Colors - 보조 강조 */
-  --accent-100: #8fbc8f; /* DarkSeaGreen - 보조 */
-  --accent-200: #345e37; /* 어두운 그린 - 진한 강조 */
+  --accent-100: #6dd89f; /* 보조 그린 */
+  --accent-200: #28a566; /* 어두운 그린 - 진한 강조 */
 
   /* Text Colors */
   --text-100: #ffffff; /* 주요 텍스트 */
@@ -29,16 +29,16 @@
   --bg-400: #1a1a1a; /* 더 어두운 배경 (구분용) */
 
   /* Status Colors - 지원 단계별 */
-  --status-interested: #8fbc8f; /* 관심 있음 */
+  --status-interested: #6dd89f; /* 관심 있음 */
   --status-preparing: #4a9eff; /* 지원 준비 */
-  --status-applied: #2e8b57; /* 지원 완료 */
+  --status-applied: #32c87b; /* 지원 완료 */
   --status-document-passed: #7b68ee; /* 서류 통과 */
   --status-interview: #ff8c42; /* 면접 대기 */
-  --status-accepted: #4caf50; /* 최종 합격 */
+  --status-accepted: #32c87b; /* 최종 합격 */
   --status-rejected: #757575; /* 불합격 */
 
   /* Semantic Colors */
-  --success: #4caf50;
+  --success: #32c87b;
   --error: #ef5350;
   --warning: #ffa726;
   --info: #42a5f5;
