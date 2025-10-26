@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { EditJobDialog } from '@/components/jobs/edit-job-dialog';
+import { JobDetailDialog } from '@/components/jobs/job-detail-dialog';
 
 interface KanbanCardProps {
   job: JobTracking;
@@ -18,6 +19,7 @@ export function KanbanCard({ job }: KanbanCardProps) {
   const deleteJob = useDeleteJob();
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const {
     attributes,
@@ -34,30 +36,31 @@ export function KanbanCard({ job }: KanbanCardProps) {
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const handleDelete = async (e: React.MouseEvent) => {
+  const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
 
     if (!confirm('이 공고를 삭제하시겠습니까?')) {
       return;
     }
 
-    try {
-      await deleteJob.mutateAsync(job.id);
-      toast({
-        title: '공고가 삭제되었습니다',
-      });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: '삭제에 실패했습니다',
-      });
-    }
+    // Optimistic update
+    deleteJob.mutate(job.id, {
+      onSuccess: () => {
+        toast({
+          title: '공고가 삭제되었습니다',
+        });
+      },
+      onError: () => {
+        toast({
+          variant: 'error',
+          title: '삭제에 실패했습니다',
+        });
+      },
+    });
   };
 
   const handleCardClick = () => {
-    if (job.url) {
-      window.open(job.url, '_blank');
-    }
+    setDetailDialogOpen(true);
   };
 
   // Calculate D-day
@@ -174,12 +177,19 @@ export function KanbanCard({ job }: KanbanCardProps) {
         </div>
       )}
 
-      {/* Memo Indicator */}
-      {job.memo && (
+      {/* Notes Indicator */}
+      {job.notes && (
         <div className="mt-2 truncate text-xs text-text-300">
-          메모: {job.memo}
+          메모: {job.notes}
         </div>
       )}
+
+      {/* Detail Dialog */}
+      <JobDetailDialog
+        job={job}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+      />
 
       {/* Edit Dialog */}
       <EditJobDialog

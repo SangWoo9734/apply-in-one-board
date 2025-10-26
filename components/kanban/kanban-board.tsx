@@ -14,7 +14,7 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { KanbanCard } from './kanban-card';
 import { useToast } from '@/hooks/use-toast';
 import { useFilterStore } from '@/store/filter-store';
@@ -77,6 +77,66 @@ export function KanbanBoard() {
     });
   }, [jobs, searchQuery, selectedStatuses]);
 
+  // Group jobs by status (memoized)
+  const jobsByStatus = useMemo(
+    () =>
+      COLUMNS.reduce(
+        (acc, column) => {
+          acc[column.id] =
+            filteredJobs?.filter((job) => job.status === column.id) || [];
+          return acc;
+        },
+        {} as Record<JobStatus, typeof filteredJobs>
+      ),
+    [filteredJobs]
+  );
+
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      setActiveId(null);
+
+      if (!over) return;
+
+      const jobId = active.id as string;
+      const newStatus = over.id as JobStatus;
+
+      const job = jobs?.find((j) => j.id === jobId);
+      if (!job || job.status === newStatus) return;
+
+      // Optimistic update - mutateAsync handles it
+      updateJob.mutate(
+        {
+          id: jobId,
+          status: newStatus,
+        },
+        {
+          onSuccess: () => {
+            toast({
+              title: '상태가 변경되었습니다',
+            });
+          },
+          onError: () => {
+            toast({
+              variant: 'error',
+              title: '상태 변경에 실패했습니다',
+            });
+          },
+        }
+      );
+    },
+    [jobs, updateJob, toast]
+  );
+
+  const activeJob = useMemo(
+    () => jobs?.find((job) => job.id === activeId),
+    [jobs, activeId]
+  );
+
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -92,58 +152,6 @@ export function KanbanBoard() {
       </div>
     );
   }
-
-  // Group jobs by status
-  const jobsByStatus = COLUMNS.reduce(
-    (acc, column) => {
-      acc[column.id] =
-        filteredJobs?.filter((job) => job.status === column.id) || [];
-      return acc;
-    },
-    {} as Record<JobStatus, typeof filteredJobs>
-  );
-
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  };
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over) {
-      setActiveId(null);
-      return;
-    }
-
-    const jobId = active.id as string;
-    const newStatus = over.id as JobStatus;
-
-    const job = jobs?.find((j) => j.id === jobId);
-    if (!job || job.status === newStatus) {
-      setActiveId(null);
-      return;
-    }
-
-    try {
-      await updateJob.mutateAsync({
-        id: jobId,
-        status: newStatus,
-      });
-
-      toast({
-        title: '상태가 변경되었습니다',
-      });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: '상태 변경에 실패했습니다',
-      });
-    }
-
-    setActiveId(null);
-  };
-
-  const activeJob = jobs?.find((job) => job.id === activeId);
 
   return (
     <DndContext
