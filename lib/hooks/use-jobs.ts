@@ -13,6 +13,8 @@ export function useJobs() {
       const result = await response.json();
       return result.data as JobTracking[];
     },
+    staleTime: 5 * 60 * 1000, // 5분간 fresh 상태 유지
+    gcTime: 10 * 60 * 1000, // 10분간 캐시 보관
   });
 }
 
@@ -45,8 +47,12 @@ export function useCreateJob() {
       const result = await response.json();
       return result.data as JobTracking;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    onSuccess: (newJob) => {
+      // Optimistic update: 새 공고를 캐시에 즉시 추가
+      queryClient.setQueryData<JobTracking[]>(['jobs'], (old) => {
+        if (!old) return [newJob];
+        return [newJob, ...old];
+      });
     },
   });
 }
@@ -76,8 +82,35 @@ export function useUpdateJob() {
       const result = await response.json();
       return result.data as JobTracking;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    onMutate: async ({ id, ...updates }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['jobs'] });
+
+      // Snapshot previous value
+      const previousJobs = queryClient.getQueryData<JobTracking[]>(['jobs']);
+
+      // Optimistically update
+      queryClient.setQueryData<JobTracking[]>(['jobs'], (old) => {
+        if (!old) return old;
+        return old.map((job) =>
+          job.id === id ? { ...job, ...updates } : job
+        );
+      });
+
+      return { previousJobs };
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousJobs) {
+        queryClient.setQueryData(['jobs'], context.previousJobs);
+      }
+    },
+    onSuccess: (updatedJob) => {
+      // Update with server response
+      queryClient.setQueryData<JobTracking[]>(['jobs'], (old) => {
+        if (!old) return [updatedJob];
+        return old.map((job) => (job.id === updatedJob.id ? updatedJob : job));
+      });
     },
   });
 }
@@ -99,8 +132,23 @@ export function useDeleteJob() {
 
       return id;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['jobs'] });
+
+      const previousJobs = queryClient.getQueryData<JobTracking[]>(['jobs']);
+
+      // Optimistically remove
+      queryClient.setQueryData<JobTracking[]>(['jobs'], (old) => {
+        if (!old) return old;
+        return old.filter((job) => job.id !== id);
+      });
+
+      return { previousJobs };
+    },
+    onError: (err, id, context) => {
+      if (context?.previousJobs) {
+        queryClient.setQueryData(['jobs'], context.previousJobs);
+      }
     },
   });
 }
