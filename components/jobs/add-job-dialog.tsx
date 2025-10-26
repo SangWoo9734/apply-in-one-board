@@ -1,7 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Link2, Loader2 } from 'lucide-react';
@@ -27,7 +32,7 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
   const handleScrape = async () => {
     if (!url) {
       toast({
-        variant: 'destructive',
+        variant: 'error',
         title: 'URL을 입력해주세요',
       });
       return;
@@ -47,7 +52,7 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
       });
     } catch (error) {
       toast({
-        variant: 'destructive',
+        variant: 'error',
         title: '정보를 가져오지 못했습니다',
         description: '직접 입력해주세요',
       });
@@ -59,7 +64,7 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
 
     if (!url || !company || !position) {
       toast({
-        variant: 'destructive',
+        variant: 'error',
         title: '필수 정보를 입력해주세요',
         description: 'URL, 회사명, 포지션은 필수입니다',
       });
@@ -88,7 +93,7 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
       onOpenChange(false);
     } catch (error) {
       toast({
-        variant: 'destructive',
+        variant: 'error',
         title: '공고 추가에 실패했습니다',
       });
     }
@@ -96,9 +101,10 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <div className="fixed inset-0 z-50 bg-black/50" />
-      <div className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] rounded-lg border border-bg-300 bg-bg-200 p-6 shadow-lg">
-        <h2 className="mb-6 text-2xl font-bold text-text-100">공고 추가</h2>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>공고 추가</DialogTitle>
+        </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* URL Input */}
@@ -213,7 +219,7 @@ export function AddJobDialog({ open, onOpenChange }: AddJobDialogProps) {
             </Button>
           </div>
         </form>
-      </div>
+      </DialogContent>
     </Dialog>
   );
 }

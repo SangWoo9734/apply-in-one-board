@@ -2,21 +2,40 @@
 
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { Chrome } from 'lucide-react';
+import { useState } from 'react';
 
 export default function LoginPage() {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleGoogleLogin = async () => {
-    const supabase = createClient();
+    setIsLoading(true);
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    try {
+      const supabase = createClient();
 
-    if (error) {
-      console.error('Error logging in:', error.message);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      setIsLoading(false);
+      toast({
+        title: '로그인 실패',
+        description:
+          error instanceof Error
+            ? error.message
+            : '로그인 중 오류가 발생했습니다. 다시 시도해주세요.',
+        variant: 'error',
+      });
     }
   };
 
@@ -40,9 +59,10 @@ export default function LoginPage() {
             variant="default"
             size="lg"
             className="w-full"
+            disabled={isLoading}
           >
             <Chrome className="mr-2 h-5 w-5" />
-            Google로 시작하기
+            {isLoading ? 'Google로 이동 중...' : 'Google로 시작하기'}
           </Button>
         </div>
 

@@ -71,7 +71,7 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-16 z-30 h-[calc(100vh-4rem)] w-64 border-r border-bg-300 bg-bg-100 transition-transform duration-200 lg:translate-x-0 overflow-y-auto',
+        'z-30 flex-1 w-64 border-r border-bg-300 bg-bg-100 transition-transform duration-200 lg:translate-x-0 overflow-y-auto w-[300px]',
         className
       )}
     >

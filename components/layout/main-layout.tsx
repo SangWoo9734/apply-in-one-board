@@ -8,7 +8,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-bg-100">
+    <div className="min-h-screen bg-bg-100 flex flex-col">
       <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
       <div className="flex">
@@ -28,8 +28,8 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-64 mt-16 p-6">
-          <div className="mx-auto max-w-7xl">{children}</div>
+        <main className="flex-1">
+          {children}
         </main>
       </div>
     </div>

@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Dialog } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Save, Loader2 } from 'lucide-react';
@@ -16,7 +21,7 @@ interface EditJobDialogProps {
 }
 
 export function EditJobDialog({ job, open, onOpenChange }: EditJobDialogProps) {
-  const [memo, setMemo] = useState('');
+  const [notes, setNotes] = useState('');
   const [deadline, setDeadline] = useState('');
 
   const { toast } = useToast();
@@ -24,7 +29,7 @@ export function EditJobDialog({ job, open, onOpenChange }: EditJobDialogProps) {
 
   useEffect(() => {
     if (job) {
-      setMemo(job.memo || '');
+      setNotes(job.notes || '');
       setDeadline(job.deadline || '');
     }
   }, [job]);
@@ -37,7 +42,7 @@ export function EditJobDialog({ job, open, onOpenChange }: EditJobDialogProps) {
     try {
       await updateJob.mutateAsync({
         id: job.id,
-        memo: memo || null,
+        notes: notes || null,
         deadline: deadline || null,
       });
 
@@ -48,7 +53,7 @@ export function EditJobDialog({ job, open, onOpenChange }: EditJobDialogProps) {
       onOpenChange(false);
     } catch (error) {
       toast({
-        variant: 'destructive',
+        variant: 'error',
         title: '저장에 실패했습니다',
       });
     }
@@ -58,9 +63,10 @@ export function EditJobDialog({ job, open, onOpenChange }: EditJobDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <div className="fixed inset-0 z-50 bg-black/50" onClick={() => onOpenChange(false)} />
-      <div className="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] rounded-lg border border-bg-300 bg-bg-200 p-6 shadow-lg">
-        <h2 className="mb-6 text-2xl font-bold text-text-100">공고 편집</h2>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>공고 편집</DialogTitle>
+        </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Company & Position (Read-only) */}
@@ -85,14 +91,14 @@ export function EditJobDialog({ job, open, onOpenChange }: EditJobDialogProps) {
             />
           </div>
 
-          {/* Memo */}
+          {/* Notes */}
           <div>
             <label className="mb-2 block text-sm font-medium text-text-200">
               메모
             </label>
             <textarea
-              value={memo}
-              onChange={(e) => setMemo(e.target.value)}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               placeholder="메모를 입력하세요..."
               className="min-h-[120px] w-full rounded-lg border border-bg-300 bg-bg-100 px-4 py-2 text-text-100 placeholder:text-text-300 focus:border-primary-100 focus:outline-none"
               rows={5}
@@ -123,7 +129,7 @@ export function EditJobDialog({ job, open, onOpenChange }: EditJobDialogProps) {
             </Button>
           </div>
         </form>
-      </div>
+      </DialogContent>
     </Dialog>
   );
 }
